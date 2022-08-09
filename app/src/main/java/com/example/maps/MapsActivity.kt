@@ -10,11 +10,14 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.maps.databinding.ActivityMapsBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+    var locator : FusedLocationProviderClient? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +29,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        locator = LocationServices.getFusedLocationProviderClient(this)
     }
 
     /**
@@ -40,9 +45,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val cairo = LatLng(30.0444, 31.2357)
-        mMap.addMarker(MarkerOptions().position(cairo).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(cairo))
+        // Add a marker in Cairo and move the camera
+//        val cairo = LatLng(30.0444, 31.2357)
+//        mMap.addMarker(MarkerOptions().position(cairo).title("Marker in Cairo"))
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(cairo))
+
+        locator?.getLastLocation().addOnSuccessListener{ location ->
+            val myLocation = LatLng(location.latitude,location.longitude)
+            mMap.addMarker(MarkerOptions().position(myLocation).title("Marker in you location"))
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation))
+        }
     }
 }
